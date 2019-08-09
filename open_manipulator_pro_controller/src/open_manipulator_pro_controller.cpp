@@ -23,15 +23,15 @@ using namespace open_manipulator_controller;
 OpenManipulatorController::OpenManipulatorController(std::string usb_port, std::string baud_rate)
     :node_handle_(""),
      priv_node_handle_("~"),
-     tool_ctrl_state_(false),
-     timer_thread_state_(false),
-     moveit_plan_state_(false),
      using_platform_(false),
      with_gripper_(false),
      using_moveit_(false),
-     moveit_plan_only_(true),
      control_period_(0.010),
-     moveit_sampling_time_(0.050)
+     moveit_sampling_time_(0.050),
+     moveit_plan_only_(true),
+     tool_ctrl_state_(false),
+     timer_thread_state_(false),
+     moveit_plan_state_(false)
 {
   control_period_       = priv_node_handle_.param<double>("control_period", 0.010);
   moveit_sampling_time_ = priv_node_handle_.param<double>("moveit_sample_duration", 0.050);
@@ -55,7 +55,7 @@ OpenManipulatorController::OpenManipulatorController(std::string usb_port, std::
 OpenManipulatorController::~OpenManipulatorController()
 {
   timer_thread_state_ = false;
-  pthread_join(timer_thread_, NULL); // Wait for the thread associated with thread_p to complete
+  pthread_join(timer_thread_, nullptr); // Wait for the thread associated with thread_p to complete
   log::info("Shutdown the OpenManipulator");
   open_manipulator_.disableAllActuator();
   ros::shutdown();
@@ -90,9 +90,9 @@ void OpenManipulatorController::startTimerThread()
   ////////////////////////////////////////////////////////////////////
 
   int error;
-  if ((error = pthread_create(&this->timer_thread_, NULL, this->timerThread, this)) != 0)
+  if ((error = pthread_create(&this->timer_thread_, nullptr, this->timerThread, this)) != 0)
   {
-    log::error("Creating timer thread failed!!", (double)error);
+    log::error("Creating timer thread failed!!", error);
     exit(-1);
   }
   timer_thread_state_ = true;
@@ -124,10 +124,10 @@ void *OpenManipulatorController::timerThread(void *param)
       next_time = curr_time;
     }
     else
-      clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_time, NULL);
+      clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_time, nullptr);
     /////
   }
-  return 0;
+  return nullptr;
 }
 
 void OpenManipulatorController::initPublisher()
@@ -247,7 +247,7 @@ bool OpenManipulatorController::goalJointSpacePathCallback(open_manipulator_msgs
 {
   std::vector <double> target_angle;
 
-  for(int i = 0; i < req.joint_position.joint_name.size(); i ++)
+  for(size_t i = 0; i < req.joint_position.joint_name.size(); i ++)
     target_angle.push_back(req.joint_position.position.at(i));
 
   open_manipulator_.makeJointTrajectory(target_angle, req.path_time);
@@ -364,7 +364,7 @@ bool OpenManipulatorController::goalJointSpacePathFromPresentCallback(open_manip
 {
   std::vector <double> target_angle;
 
-  for(int i = 0; i < req.joint_position.joint_name.size(); i ++)
+  for(size_t i = 0; i < req.joint_position.joint_name.size(); i ++)
     target_angle.push_back(req.joint_position.position.at(i));
 
   open_manipulator_.makeJointTrajectoryFromPresentPosition(target_angle, req.path_time);
@@ -427,7 +427,7 @@ bool OpenManipulatorController::goalTaskSpacePathFromPresentOrientationOnlyCallb
 bool OpenManipulatorController::goalToolControlCallback(open_manipulator_msgs::SetJointPosition::Request  &req,
                                                         open_manipulator_msgs::SetJointPosition::Response &res)
 {
-  for(int i = 0; i < req.joint_position.joint_name.size(); i ++)
+  for(size_t i = 0; i < req.joint_position.joint_name.size(); i ++)
     open_manipulator_.makeToolTrajectory(req.joint_position.joint_name.at(i), req.joint_position.position.at(i));
 
   res.is_planned = true;
@@ -441,7 +441,7 @@ bool OpenManipulatorController::setActuatorStateCallback(open_manipulator_msgs::
   {
     log::println("Wait a second for actuator enable", "GREEN");
     timer_thread_state_ = false;
-    pthread_join(timer_thread_, NULL); // Wait for the thread associated with thread_p to complete
+    pthread_join(timer_thread_, nullptr); // Wait for the thread associated with thread_p to complete
     open_manipulator_.enableAllActuator();
     startTimerThread();
   }
@@ -449,7 +449,7 @@ bool OpenManipulatorController::setActuatorStateCallback(open_manipulator_msgs::
   {
     log::println("Wait a second for actuator disable", "GREEN");
     timer_thread_state_ = false;
-    pthread_join(timer_thread_, NULL); // Wait for the thread associated with thread_p to complete
+    pthread_join(timer_thread_, nullptr); // Wait for the thread associated with thread_p to complete
     open_manipulator_.disableAllActuator();
     startTimerThread();
   }
@@ -720,8 +720,8 @@ void OpenManipulatorController::publishJointStates()
     msg.name.push_back(tool_name.at(i));
 
     msg.position.push_back(tool_value.at(i).position);
-    msg.velocity.push_back(0.0f);
-    msg.effort.push_back(0.0f);
+    msg.velocity.push_back(0.0);
+    msg.effort.push_back(0.0);
   }
   open_manipulator_joint_states_pub_.publish(msg);
 }
@@ -763,7 +763,7 @@ void OpenManipulatorController::publishCallback(const ros::TimerEvent&)
 
 void OpenManipulatorController::moveitTimer(double present_time)
 {
-  static double priv_time = 0.0f;
+  static double priv_time = 0.0;
   static uint32_t step_cnt = 0;
 
   if (moveit_plan_state_ == true)
@@ -772,7 +772,7 @@ void OpenManipulatorController::moveitTimer(double present_time)
     if (path_time > moveit_sampling_time_)
     {
       JointWaypoint target;
-      uint32_t all_time_steps = joint_trajectory_.points.size();
+      size_t all_time_steps = joint_trajectory_.points.size();
 
       for(uint8_t i = 0; i < joint_trajectory_.points[step_cnt].positions.size(); i++)
       {

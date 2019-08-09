@@ -29,7 +29,7 @@ OpenManipulator::~OpenManipulator()
     delete custom_trajectory_[index];
 }
 
-void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING usb_port, STRING baud_rate, float control_loop_time, bool with_gripper)
+void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING usb_port, STRING baud_rate, double control_loop_time, bool with_gripper)
 {
   /*****************************************************************************
   ** Initialize Manipulator Parameter
@@ -124,7 +124,7 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
 
   addJoint("joint6",   // my name
             "joint5",  // parent name
-            "gripper", // child name
+            "tool", // child name
             math::vector3(0.123, 0.0, 0.0),                  // relative position
             math::convertRPYToRotationMatrix(0.0, 0.0, 0.0), // relative orientation
             X_AXIS,    // axis of rotation
@@ -139,10 +139,10 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
             math::vector3(4.4206755e-02, 3.6839985e-07, 8.9142216e-03)            // COM
             );
 
-  int gripper_id = -1;
+  int8_t gripper_id = -1;
   if (with_gripper) gripper_id = 7;
 
-  addTool("gripper",  // my name
+  addTool("tool",  // my name
           "joint6",   // parent name
           math::vector3(0.1223, 0.0, 0.0),                    // relative position
           // math::vector3(0.150, 0.0, 0.0),                  // relative position
@@ -211,17 +211,6 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
       STRING gripper_dxl_mode_arg = "current_based_position_mode";
       void *p_gripper_dxl_mode_arg = &gripper_dxl_mode_arg;
       setToolActuatorMode(TOOL_DYNAMIXEL, p_gripper_dxl_mode_arg);
-
-      // Set gripper actuator parameter
-      // STRING gripper_dxl_opt_arg[2];
-      // void *p_gripper_dxl_opt_arg = &gripper_dxl_opt_arg;
-      // gripper_dxl_opt_arg[0] = "Profile_Acceleration";
-      // gripper_dxl_opt_arg[1] = "20";
-      // setToolActuatorMode(TOOL_DYNAMIXEL, p_gripper_dxl_opt_arg);
-
-      // gripper_dxl_opt_arg[0] = "Profile_Velocity";
-      // gripper_dxl_opt_arg[1] = "20";
-      // setToolActuatorMode(TOOL_DYNAMIXEL, p_gripper_dxl_opt_arg);
     }
 
     // Enable All Actuators 
@@ -275,8 +264,7 @@ void OpenManipulator::processOpenManipulator(double present_time, bool using_act
 
     if (using_actual_robot_state)
     {
-        getManipulator()->setJointValue(tool_component_name.at(0), 
-                                        angleToDistance(receiveAllToolActuatorValue()).at(0));
+        getManipulator()->setJointValue(tool_component_name.at(0), angleToDistance(receiveAllToolActuatorValue()).at(0));
     }
   }
   
@@ -285,6 +273,7 @@ void OpenManipulator::processOpenManipulator(double present_time, bool using_act
 
   solveForwardKinematics();
 }
+
 
 JointWaypoint OpenManipulator::distanceToAngle(JointWaypoint distance)
 {
