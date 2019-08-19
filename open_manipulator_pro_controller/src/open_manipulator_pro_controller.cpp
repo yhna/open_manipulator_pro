@@ -675,6 +675,9 @@ void OpenManipulatorController::publishOpenManipulatorStates()
 void OpenManipulatorController::publishKinematicsPose()
 {
   open_manipulator_msgs::KinematicsPose msg;
+  ros::WallTime now = ros::WallTime::now();
+  msg.header.stamp = ros::Time(now.sec, now.nsec);
+
   auto opm_tools_name = open_manipulator_.getManipulator()->getAllToolComponentName();
 
   uint8_t index = 0;

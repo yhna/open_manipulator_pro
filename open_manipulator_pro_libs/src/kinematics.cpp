@@ -1025,7 +1025,7 @@ void SolverUsingCRAndGeometry::forwardSolverUsingChainRule(Manipulator *manipula
 {
   Name my_name = component_name;
   Name parent_name = manipulator->getComponentParentName(my_name);
-  int8_t number_of_child = manipulator->getComponentChildName(my_name).size();
+  size_t number_of_child = manipulator->getComponentChildName(my_name).size();
 
   Pose parent_pose_value;
   Pose my_pose_value;
@@ -1056,7 +1056,7 @@ void SolverUsingCRAndGeometry::forwardSolverUsingChainRule(Manipulator *manipula
 
   manipulator->setComponentPoseFromWorld(my_name, my_pose_value);
 
-  for (int8_t index = 0; index < number_of_child; index++)
+  for (size_t index = 0; index < number_of_child; index++)
   {
     Name child_name = manipulator->getComponentChildName(my_name).at(index);
     forwardSolverUsingChainRule(manipulator, child_name);

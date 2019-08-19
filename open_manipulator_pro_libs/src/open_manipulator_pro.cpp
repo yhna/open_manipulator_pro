@@ -139,22 +139,20 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
             math::vector3(4.4206755e-02, 3.6839985e-07, 8.9142216e-03)            // COM
             );
 
-  int8_t gripper_id = -1;
-  if (with_gripper) gripper_id = 7;
+  addComponentChild("joint6", "zed_left_camera");
 
+  /////// tool
   addTool("tool",  // my name
           "joint6",   // parent name
           math::vector3(0.14277, 0.0, 0.0),                    // relative position
-          math::convertRPYToRotationMatrix(0.0, 0.0, 0.0), // relative orientation
-          gripper_id,  // actuator id
-          0.0,     // max gripper limit (0.01 m)
-          0.0,    // min gripper limit (-0.01 m)
-          0.0,    // Change unit from `meter` to `radian`
-          0,                                                    // mass
-          math::inertiaMatrix(9.5568826e-06, 2.8424644e-06, -3.2829197e-10,
-                              2.2552871e-05, -3.1463634e-10,
-                              1.7605306e-05),                                   // inertial tensor
-          math::vector3(0.028 + 8.3720668e-03, 0.0246, -4.2836895e-07)          // COM
+          math::convertRPYToRotationMatrix(0.0, 0.0, 0.0)      // relative orientation
+          );
+
+  /////// camera
+  addTool("zed_left_camera",  // my name
+          "joint6",   // parent name
+          math::vector3(0.025, 0.025, 0.0383),                    // relative position
+          math::convertRPYToRotationMatrix(0.0, 0.0, 0.0)        // relative orientation
           );
 
   /*****************************************************************************
