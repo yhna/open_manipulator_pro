@@ -21,6 +21,22 @@
     </include>
   </group>
 
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find open_manipulator_pro_description)/urdf/open_manipulator_pro.urdf.xacro'"/>
+    <!-- Send joint values -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <param name="/use_gui" value="false"/>
+      <rosparam param="source_list" subst_value="true">["$(arg use_robot_name)/joint_states"]</rosparam>
+    </node>
+
+    <!-- Combine joint values to TF-->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+
+    <node pkg="tf" type="static_transform_publisher" name="zed_base_frame_to_manipulator_frame"
+        args="0.025 0.025 0.0383 0.0 0.0 0.0 end_link zed_left_camera_frame 1" />
+
+
+
   <node name="$(arg use_robot_name)" pkg="open_manipulator_pro_controller" type="open_manipulator_pro_controller" output="screen" args="$(arg dynamixel_usb_port) $(arg dynamixel_baud_rate)">
       <param name="using_platform"       value="$(arg use_platform)"/>
       <param name="with_gripper"         value="$(arg with_gripper)"/>
