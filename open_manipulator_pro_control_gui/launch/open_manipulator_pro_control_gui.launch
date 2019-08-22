@@ -1,6 +1,6 @@
 <launch>
   <arg name="robot_name"   default="open_manipulator_pro"/>
-  <arg name="end_effector" default="gripper"/>
+  <arg name="end_effector" default="tool"/>
   <arg name="with_gripper" default="false"/>
 
   <group ns="$(arg robot_name)">

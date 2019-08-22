@@ -144,7 +144,7 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
   /////// tool
   addTool("tool",  // my name
           "joint6",   // parent name
-          math::vector3(0.14277, 0.0, 0.0),                    // relative position
+          math::vector3(0.136, 0.0, 0.0),                    // relative position
           math::convertRPYToRotationMatrix(0.0, 0.0, 0.0)      // relative orientation
           );
 

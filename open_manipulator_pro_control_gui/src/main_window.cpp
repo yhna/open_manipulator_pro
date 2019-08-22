@@ -58,8 +58,8 @@ void MainWindow::timerCallback()
   int joint_size = 6;
   if (qnode.getWithGripperState()) joint_size = 7;
 
-  if(joint_angle.size() != joint_size)
-    return;
+//  if(joint_angle.size() != joint_size)
+//    return;
 
   ui.txt_j1->setText(QString::number(joint_angle.at(0),'f', 3));
   ui.txt_j2->setText(QString::number(joint_angle.at(1),'f', 3));

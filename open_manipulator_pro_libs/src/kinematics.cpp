@@ -1075,10 +1075,11 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   position = target_pose.kinematic.position;
   orientation = target_pose.kinematic.orientation;
   double d6 = 0.123;
-  if (with_gripper_)
+  //if (with_gripper_)
   {
-    d6 += 0.1223;
+    d6 += 0.136;
   }
+
   Eigen::Vector3d position_2 = Eigen::VectorXd::Zero(3);
   position_2 << orientation(0,0), orientation(1,0), orientation(2,0);
   Eigen::Vector3d position_3 = Eigen::VectorXd::Zero(3);
