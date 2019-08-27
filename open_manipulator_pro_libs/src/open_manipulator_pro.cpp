@@ -112,8 +112,8 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
             math::convertRPYToRotationMatrix(0.0, 0.0, 0.0), // relative orientation
             Y_AXIS,    // axis of rotation
             5,         // actuator id
-            M_PI,      // max joint limit (3.14 rad)
-            -M_PI,     // min joint limit (-3.14 rad)
+            M_PI/2,      // max joint limit (3.14 rad)
+            -M_PI/2,     // min joint limit (-3.14 rad)
             1.0,       // coefficient
             1.4327573e-01,                                                        // mass
             math::inertiaMatrix(8.0870749e-05, 0.0, -1.0157896e-06,
@@ -159,6 +159,8 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
   ** Initialize Kinematics 
   *****************************************************************************/
   kinematics_ = new kinematics::SolverUsingCRAndGeometry();
+//  kinematics_ = new kinematics::SolverUsingCRAndSRJacobian();
+//  kinematics_ = new kinematics::SolverUsingCRAndSRJacobian();
 
   addKinematics(kinematics_);
 

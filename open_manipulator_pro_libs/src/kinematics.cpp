@@ -1084,8 +1084,11 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   position_2 << orientation(0,0), orientation(1,0), orientation(2,0);
   Eigen::Vector3d position_3 = Eigen::VectorXd::Zero(3);
   position_3 = position - d6*position_2;
-  if (position_3(0) > 0) target_angle[0].position = atan2(position_3(1), position_3(0));
-  else target_angle[0].position = atan2(position_3(1), position_3(0)) + PI;
+
+  target_angle[0].position = atan2(position_3(1), position_3(0));
+//  if (position_3(0) > 0) else target_angle[0].position = atan2(position_3(1), position_3(0)) + PI;
+//  else target_angle[0].position = atan2(position_3(1), position_3(0)) + PI;
+
 
   // Compute Joint 3
   Eigen::VectorXd position3 = Eigen::VectorXd::Zero(3); 
@@ -1102,8 +1105,9 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   double phi = acos((l1*l1 + l2*l2 - position3_4.norm()*position3_4.norm()) / (2*l1*l2));
   double alpha1 = atan2(0.030, 0.264);
   double alpha2 = atan2(0.258, 0.030);
-  if (position_3(0) > 0) target_angle[2].position = PI - (phi-alpha1) - alpha2;
-  else target_angle[2].position = PI + (phi-alpha1) - alpha2;
+  target_angle[2].position = PI - (phi-alpha1) - alpha2;
+//  if (position3_4(2) > 0) target_angle[2].position = PI - (phi-alpha1) - alpha2;
+//  else target_angle[2].position = PI + (phi-alpha1) - alpha2;
 
   // Compute Joint 2
   Eigen::VectorXd position2 = Eigen::VectorXd::Zero(3); 
@@ -1111,11 +1115,40 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   position2 = orientation2.inverse() * position3_4;
   double beta1 = atan2(position2(2), position2(0));
   double beta2 = acos((l1*l1 + position3_4.norm()*position3_4.norm() - l2*l2) / (2*l1*position3_4.norm()));
-  if (position_3(0) > 0) target_angle[1].position = (PI/2-alpha1) - fabs(beta1) - beta2;
+  if (position3_4(2) > 0) target_angle[1].position = (PI/2-alpha1) - fabs(beta1) - beta2;
   else target_angle[1].position = (PI/2-alpha1) + fabs(beta1) - beta2;
 
+
+//  // Orientation
+//  Eigen::MatrixXd orientation_to_joint3 = math::convertRPYToRotationMatrix(0,0,target_angle[0].position)
+//                                        * math::convertRPYToRotationMatrix(0,target_angle[1].position,0)
+//                                        * math::convertRPYToRotationMatrix(0,target_angle[2].position,0);
+//  Eigen::MatrixXd orientation_def = orientation_to_joint3.transpose() * orientation;
+
+//  if(orientation_def(0,0) < 1.0)
+//  {
+//    if(orientation_def(0,0) > -1.0)
+//    {
+//      target_angle[4].position = acos(orientation_def(0,0));
+//      target_angle[3].position = atan2(orientation_def(1,0), -orientation_def(2,0));
+//      target_angle[5].position = atan2(orientation_def(1,0), orientation_def(2,0));
+//    }
+//    else    // r00 = -1
+//    {
+//      target_angle[3].position = _manipulator.getJointPosition("joint4");
+//      target_angle[4].position = 0.0;
+//      target_angle[5].position = atan2(-orientation_def(1,2), orientation_def(1,1));
+//    }
+//  }
+//  else      // r00 = 1
+//  {
+//    target_angle[4].position = acos(orientation_def(0,0));
+//    target_angle[3].position = atan2(orientation_def(1,0), -orientation_def(2,0));
+//    target_angle[5].position = atan2(orientation_def(1,0), orientation_def(2,0));
+//  }
+
   // Compute Joint 5
-  Eigen::Vector3d position5 = Eigen::VectorXd::Zero(3); 
+  Eigen::Vector3d position5 = Eigen::VectorXd::Zero(3);
   Eigen::MatrixXd orientation5 = math::convertRPYToRotationMatrix(0,0,target_angle[0].position)
                                  * math::convertRPYToRotationMatrix(0,target_angle[1].position,0)
                                  * math::convertRPYToRotationMatrix(0,target_angle[2].position,0);
@@ -1134,15 +1167,38 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   else if (target_angle[5].position < -PI/2) target_angle[5].position = target_angle[5].position + PI;
   
 
-  // log::println("------------------------------------");
-  // log::println("End-effector Pose : ");
-  // log::println("position1: ", target_angle[0].position);
-  // log::println("position2: ", target_angle[1].position);
-  // log::println("position3: ", target_angle[2].position);
-  // log::println("position5: ", target_angle[4].position);
-  // log::println("position4: ", target_angle[3].position);
-  // log::println("position6: ", target_angle[5].position);
-  // log::println("------------------------------------");
+   log::println("------------------------------------");
+   log::println("End-effector Pose : ");
+   log::println("position1: ", target_angle[0].position);
+   log::println("position2: ", target_angle[1].position);
+   log::println("position3: ", target_angle[2].position);
+   log::println("position5: ", target_angle[4].position);
+   log::println("position4: ", target_angle[3].position);
+   log::println("position6: ", target_angle[5].position);
+   log::println("------------------------------------");
+
+   if(std::isnan(target_angle[0].position) ||
+      std::isnan(target_angle[1].position) ||
+      std::isnan(target_angle[2].position) ||
+      std::isnan(target_angle[3].position) ||
+      std::isnan(target_angle[4].position) ||
+      std::isnan(target_angle[5].position) )
+   {
+     log::error("Target angle value is NAN!!");
+    return false;
+   }
+
+
+   if(std::isinf(target_angle[0].position) ||
+      std::isinf(target_angle[1].position) ||
+      std::isinf(target_angle[2].position) ||
+      std::isinf(target_angle[3].position) ||
+      std::isinf(target_angle[4].position) ||
+      std::isinf(target_angle[5].position) )
+   {
+     log::error("Target angle value is INF!!");
+    return false;
+   }
 
   target_angle_vector.push_back(target_angle[0]);
   target_angle_vector.push_back(target_angle[1]);
