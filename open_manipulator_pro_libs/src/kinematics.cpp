@@ -1076,7 +1076,7 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
   orientation = target_pose.kinematic.orientation;
   double d6 = 0.123;
 
-  auto tool_length = _manipulator.getComponentRelativePositionFromParent("tool");
+  auto tool_length = _manipulator.getComponentRelativePositionFromParent(tool_name);
   d6 += tool_length(0);
 
   Eigen::Vector3d position_2 = Eigen::VectorXd::Zero(3);
