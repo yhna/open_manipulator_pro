@@ -95,8 +95,8 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
             math::convertRPYToRotationMatrix(0.0, 0.0, 0.0), // relative orientation
             X_AXIS,    // axis of rotation
             4,         // actuator id
-            M_PI,      // max joint limit (3.14 rad)
-            -M_PI,     // min joint limit (-3.14 rad)
+            M_PI*0.9,      // max joint limit (3.14 rad)
+            -M_PI*0.9,     // min joint limit (-3.14 rad)
             1.0,       // coefficient
             1.4327573e-01,                                                        // mass
             math::inertiaMatrix(8.0870749e-05, 0.0, -1.0157896e-06,
@@ -266,8 +266,19 @@ void OpenManipulator::processOpenManipulator(double present_time, bool using_act
         getManipulator()->setJointValue(tool_component_name.at(0), angleToDistance(receiveAllToolActuatorValue()).at(0));
     }
   }
+
   
-  if(goal_joint_value.size() != 0) sendAllJointActuatorValue(goal_joint_value);
+  if(goal_joint_value.size() != 0)
+  {
+//    log::println("-------------------------------");
+//    log::println("0 : ", goal_joint_value.at((0)).position,5);
+//    log::println("1 : ", goal_joint_value.at((1)).position,5);
+//    log::println("2 : ", goal_joint_value.at((2)).position,5);
+//    log::println("3 : ", goal_joint_value.at((3)).position,5);
+//    log::println("4 : ", goal_joint_value.at((4)).position,5);
+//    log::println("5 : ", goal_joint_value.at((5)).position,5);
+    sendAllJointActuatorValue(goal_joint_value);
+  }
   if (with_gripper) {if(goal_tool_value.size() != 0) {sendAllToolActuatorValue(goal_tool_value);}}
 
   solveForwardKinematics();

@@ -1131,17 +1131,23 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
       double joint4_angle_present = _manipulator.getJointPosition("joint4");
       double joint4_angle_temp_1 = atan2(orientation_def(1,0), -orientation_def(2,0));
       double joint4_angle_temp_2 = atan2(-orientation_def(1,0), orientation_def(2,0));
+      log::print("1: ",joint4_angle_temp_1);
+      log::print(" - ",joint4_angle_present);
+      log::println(" = :",fabs(joint4_angle_temp_1-joint4_angle_present));
+      log::print("2: ",joint4_angle_temp_2);
+      log::print(" - ",joint4_angle_present);
+      log::println(" = :",fabs(joint4_angle_temp_2-joint4_angle_present));
 
-      if(fabs(joint4_angle_present-joint4_angle_temp_1) < fabs(joint4_angle_present-joint4_angle_temp_2))
+      if(fabs(joint4_angle_temp_1-joint4_angle_present) < fabs(joint4_angle_temp_2-joint4_angle_present))
       {
-        log::println("joint4_angle_temp_1", fabs(joint4_angle_present-joint4_angle_temp_1));
+        log::info("---1---");
         target_angle[3].position = joint4_angle_temp_1;
         target_angle[4].position = acos(orientation_def(0,0));
         target_angle[5].position = atan2(orientation_def(0,1), orientation_def(0,2));
       }
       else
       {
-        log::println("joint4_angle_temp_2", fabs(joint4_angle_present-joint4_angle_temp_2));
+        log::info("---2---");
         target_angle[3].position = joint4_angle_temp_2;
         target_angle[4].position = -acos(orientation_def(0,0));
         target_angle[5].position = atan2(-orientation_def(0,1), -orientation_def(0,2));
