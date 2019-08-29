@@ -82,6 +82,7 @@ class OpenManipulatorController
   ros::Subscriber execute_traj_goal_sub_;
 
   // ROS Service Server
+  ros::ServiceServer wait_path_server_;
   ros::ServiceServer goal_joint_space_path_server_;
   ros::ServiceServer goal_joint_space_path_to_kinematics_pose_server_;
   ros::ServiceServer goal_joint_space_path_to_kinematics_position_server_;
@@ -137,6 +138,9 @@ class OpenManipulatorController
   void executeTrajGoalCallback(const moveit_msgs::ExecuteTrajectoryActionGoal::ConstPtr &msg);
 
   double getControlPeriod(void){return control_period_;}
+
+  bool waitPathCallback(open_manipulator_msgs::SetJointPosition::Request  &req,
+                        open_manipulator_msgs::SetJointPosition::Response &res);
 
   bool goalJointSpacePathCallback(open_manipulator_msgs::SetJointPosition::Request  &req,
                                   open_manipulator_msgs::SetJointPosition::Response &res);

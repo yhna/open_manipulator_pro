@@ -182,6 +182,8 @@ void OpenManipulatorController::initSubscriber()
 
 void OpenManipulatorController::initServer()
 {
+  wait_path_server_ = priv_node_handle_.advertiseService("wait_path", &OpenManipulatorController::waitPathCallback, this);
+
   goal_joint_space_path_server_                     = priv_node_handle_.advertiseService("goal_joint_space_path", &OpenManipulatorController::goalJointSpacePathCallback, this);
   goal_joint_space_path_to_kinematics_pose_server_  = priv_node_handle_.advertiseService("goal_joint_space_path_to_kinematics_pose", &OpenManipulatorController::goalJointSpacePathToKinematicsPoseCallback, this);
   goal_joint_space_path_to_kinematics_position_server_  = priv_node_handle_.advertiseService("goal_joint_space_path_to_kinematics_position", &OpenManipulatorController::goalJointSpacePathToKinematicsPositionCallback, this);
@@ -240,6 +242,15 @@ void OpenManipulatorController::executeTrajGoalCallback(const moveit_msgs::Execu
 {
   log::println("[INFO] [OpenManipulator Controller] Execute Moveit planned path", "GREEN");
   moveit_plan_state_ = true;
+}
+
+bool OpenManipulatorController::waitPathCallback(open_manipulator_msgs::SetJointPosition::Request &req,
+                                                 open_manipulator_msgs::SetJointPosition::Response &res)
+{
+  open_manipulator_.sleepTrajectory(req.path_time);
+
+  res.is_planned = true;
+  return true;
 }
 
 bool OpenManipulatorController::goalJointSpacePathCallback(open_manipulator_msgs::SetJointPosition::Request  &req,
