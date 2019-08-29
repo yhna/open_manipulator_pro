@@ -1131,12 +1131,12 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
       double joint4_angle_present = _manipulator.getJointPosition("joint4");
       double joint4_angle_temp_1 = atan2(orientation_def(1,0), -orientation_def(2,0));
       double joint4_angle_temp_2 = atan2(-orientation_def(1,0), orientation_def(2,0));
-      log::print("1: ",joint4_angle_temp_1);
-      log::print(" - ",joint4_angle_present);
-      log::println(" = :",fabs(joint4_angle_temp_1-joint4_angle_present));
-      log::print("2: ",joint4_angle_temp_2);
-      log::print(" - ",joint4_angle_present);
-      log::println(" = :",fabs(joint4_angle_temp_2-joint4_angle_present));
+      log::print("1: ",joint4_angle_temp_1*RAD2DEG);
+      log::print(" - ",joint4_angle_present*RAD2DEG);
+      log::println(" = :",fabs(joint4_angle_temp_1-joint4_angle_present)*RAD2DEG);
+      log::print("2: ",joint4_angle_temp_2*RAD2DEG);
+      log::print(" - ",joint4_angle_present*RAD2DEG);
+      log::println(" = :",fabs(joint4_angle_temp_2-joint4_angle_present)*RAD2DEG);
 
       if(fabs(joint4_angle_temp_1-joint4_angle_present) < fabs(joint4_angle_temp_2-joint4_angle_present))
       {
@@ -1199,6 +1199,8 @@ bool SolverUsingCRAndGeometry::inverseSolverUsingGeometry(Manipulator *manipulat
      log::error("Target angle value is INF!!");
     return false;
    }
+
+   log::println("target_angle[3] :",target_angle[3].position*RAD2DEG);
 
   target_angle_vector.push_back(target_angle[0]);
   target_angle_vector.push_back(target_angle[1]);
